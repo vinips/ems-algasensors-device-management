@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-public class TSIDTest {
+class TSIDTest {
 
     @Test
-    public void shouldGenerateTSID() {
+    void shouldGenerateTSID() {
         TSID tsid = IdGenerator.generateTSID();
 
         Assertions.assertThat(tsid.getInstant())
