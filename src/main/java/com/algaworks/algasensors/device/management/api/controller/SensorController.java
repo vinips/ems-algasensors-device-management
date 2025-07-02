@@ -7,7 +7,9 @@ import com.algaworks.algasensors.device.management.domain.model.Sensor;
 import com.algaworks.algasensors.device.management.domain.model.SensorId;
 import com.algaworks.algasensors.device.management.domain.repository.SensorRepository;
 import io.hypersistence.tsid.TSID;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -29,7 +31,7 @@ public class SensorController {
         return sensors.map(this::convertToOutputModel);
     }
 
-    //Utiliza o conversor do Spring XXX que criamos para converter
+    //Utiliza o conversor StringToTSIDWebConverter para que o Spring converta o ID String em TSID.
     @GetMapping("{sensorId}")
     public SensorOutput findOne(@PathVariable TSID sensorId){
         Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
@@ -54,6 +56,26 @@ public class SensorController {
         sensorRepository.saveAndFlush(sensor);
 
         return convertToOutputModel(sensor);
+    }
+
+    @PutMapping("{sensorId}")
+    public SensorOutput update(@RequestBody @Valid SensorInput sensorInput, @PathVariable TSID sensorId) {
+        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        BeanUtils.copyProperties(sensorInput, sensor, "id");
+        sensorRepository.saveAndFlush(sensor);
+
+        return convertToOutputModel(sensor);
+    }
+
+    @DeleteMapping("{sensorId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable TSID sensorId) {
+        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        sensorRepository.delete(sensor);
     }
 
     private SensorOutput convertToOutputModel(Sensor sensor) {
