@@ -22,6 +22,9 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class SensorController {
 
+    //Injeção via Construtor é mais correta que o @Autowired.
+    //Como estamos utilizando lombok e a palavra final.
+    //Ao anotar o @RequiredArgsConstructor ele ja cria o construtor com a depencendia para a gente.
     private final SensorRepository sensorRepository;
 
     @GetMapping
