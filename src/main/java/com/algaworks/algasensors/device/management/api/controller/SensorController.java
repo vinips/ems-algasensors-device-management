@@ -37,8 +37,7 @@ public class SensorController {
     //Utiliza o conversor StringToTSIDWebConverter para que o Spring converta o ID String em TSID.
     @GetMapping("{sensorId}")
     public SensorOutput findOne(@PathVariable TSID sensorId){
-        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Sensor sensor = findByIdOrFail(sensorId);
 
         return convertToOutputModel(sensor);
     }
@@ -63,8 +62,7 @@ public class SensorController {
 
     @PutMapping("{sensorId}")
     public SensorOutput update(@RequestBody @Valid SensorInput sensorInput, @PathVariable TSID sensorId) {
-        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Sensor sensor = findByIdOrFail(sensorId);
 
         BeanUtils.copyProperties(sensorInput, sensor, "id");
         sensorRepository.saveAndFlush(sensor);
@@ -75,8 +73,7 @@ public class SensorController {
     @DeleteMapping("{sensorId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable TSID sensorId) {
-        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Sensor sensor = findByIdOrFail(sensorId);
 
         sensorRepository.delete(sensor);
     }
@@ -84,8 +81,7 @@ public class SensorController {
     @PutMapping("{sensorId}/enable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void enable(@PathVariable TSID sensorId) {
-        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Sensor sensor = findByIdOrFail(sensorId);
         sensor.setEnabled(true);
 
         sensorRepository.saveAndFlush(sensor);
@@ -94,8 +90,7 @@ public class SensorController {
     @DeleteMapping("{sensorId}/disable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void disable(@PathVariable TSID sensorId) {
-        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Sensor sensor = findByIdOrFail(sensorId);
         sensor.setEnabled(false);
 
         sensorRepository.saveAndFlush(sensor);
@@ -111,6 +106,11 @@ public class SensorController {
                 .model(sensor.getModel())
                 .enabled(false)
                 .build();
+    }
+
+    private Sensor findByIdOrFail(TSID sensorId) {
+        return sensorRepository.findById(new SensorId(sensorId))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
 
