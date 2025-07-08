@@ -1,5 +1,6 @@
 package com.algaworks.algasensors.device.management.api.controller;
 
+import com.algaworks.algasensors.device.management.api.client.SensorMonitoringClient;
 import com.algaworks.algasensors.device.management.api.model.SensorInput;
 import com.algaworks.algasensors.device.management.api.model.SensorOutput;
 import com.algaworks.algasensors.device.management.common.IdGenerator;
@@ -26,6 +27,8 @@ public class SensorController {
     //Como estamos utilizando lombok e a palavra final.
     //Ao anotar o @RequiredArgsConstructor ele ja cria o construtor com a depencendia para a gente.
     private final SensorRepository sensorRepository;
+
+    private final SensorMonitoringClient sensorMonitoringClient;
 
     @GetMapping
     public Page<SensorOutput> findAll(@PageableDefault Pageable pageable) {
@@ -76,6 +79,8 @@ public class SensorController {
         Sensor sensor = findByIdOrFail(sensorId);
 
         sensorRepository.delete(sensor);
+
+        sensorMonitoringClient.disableMonitoring(sensorId);
     }
 
     @PutMapping("{sensorId}/enable")
@@ -85,6 +90,8 @@ public class SensorController {
         sensor.setEnabled(true);
 
         sensorRepository.saveAndFlush(sensor);
+
+        sensorMonitoringClient.enableMonitoring(sensorId);
     }
 
     @DeleteMapping("{sensorId}/disable")
@@ -94,6 +101,8 @@ public class SensorController {
         sensor.setEnabled(false);
 
         sensorRepository.saveAndFlush(sensor);
+
+        sensorMonitoringClient.disableMonitoring(sensorId);
     }
 
     private SensorOutput convertToOutputModel(Sensor sensor) {
@@ -104,7 +113,7 @@ public class SensorController {
                 .location(sensor.getLocation())
                 .protocol(sensor.getLocation())
                 .model(sensor.getModel())
-                .enabled(false)
+                .enabled(sensor.getEnabled())
                 .build();
     }
 
