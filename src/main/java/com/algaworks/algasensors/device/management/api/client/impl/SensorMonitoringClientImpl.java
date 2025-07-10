@@ -2,6 +2,7 @@ package com.algaworks.algasensors.device.management.api.client.impl;
 
 import com.algaworks.algasensors.device.management.api.client.RestClientFactory;
 import com.algaworks.algasensors.device.management.api.client.SensorMonitoringClient;
+import com.algaworks.algasensors.device.management.api.model.SensorMonitoringOutput;
 import io.hypersistence.tsid.TSID;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -14,7 +15,9 @@ public class SensorMonitoringClientImpl implements SensorMonitoringClient {
 
     @SuppressWarnings("squid:S125")
     //Melhor fazer a configuração do RestClient assim, via Builder.
-    //Se instanciar direto com o create(http), ele vem sem nenhuma outra configuração base.
+    //Se instanciar direto com o RestClient.create(http), ele vem sem nenhuma outra configuração base.
+    //Por exemplo os módulos do Jackson não sou chamados, fazendo com que as classes
+    //TSIDToStringSerializer e StringToTSIDDeserializer funcionem.
     /*
     public SensorMonitoringClientImpl(RestClient.Builder builder) {
         this.restClient = builder.baseUrl("http://localhost:8082")
@@ -45,5 +48,13 @@ public class SensorMonitoringClientImpl implements SensorMonitoringClient {
                 .uri("/api/sensors/{sensorId}/monitoring/disable", sensorId)
                 .retrieve()
                 .toBodilessEntity();
+    }
+
+    @Override
+    public SensorMonitoringOutput getDetail(TSID sensorId) {
+        return restClient.get()
+                .uri("/api/sensors/{sensorId}/monitoring", sensorId)
+                .retrieve()
+                .body(SensorMonitoringOutput.class);
     }
 }
