@@ -4,11 +4,13 @@ import com.algaworks.algasensors.device.management.api.client.RestClientFactory;
 import com.algaworks.algasensors.device.management.api.client.SensorMonitoringClient;
 import com.algaworks.algasensors.device.management.api.model.SensorMonitoringOutput;
 import io.hypersistence.tsid.TSID;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 
-@Component
+/** Classe descontinuada na aula 11.7. Foi substituida pela RestClientConfig, que faz a mesma coisa com menos código
+ *  utilizando as anotações na Interface SensorMonitoringClient **/
+
+//@Component
 public class SensorMonitoringClientImpl implements SensorMonitoringClient {
 
     private final RestClient restClient;
